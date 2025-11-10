@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional; // <-- IMPORTACIÓN AÑADIDA
 
 @Service
 @Transactional
@@ -17,42 +18,43 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public List<Usuario> findAll() {
+    /**
+     * Obtiene todos los usuarios.
+     * (Equivalente a tu método 'findAll')
+     */
+    public List<Usuario> getAllUsers() {
         return usuarioRepository.findAll();
     }
 
-    public Usuario findByRut(String rut) {
-        return usuarioRepository.findById(rut).get();
-    }
-
-    //Save crea tanto como actualiza
-    public Usuario save(Usuario usuario) {
+    /**
+     * Guarda un usuario nuevo o actualiza uno existente.
+     * (Equivalente a tu método 'save')
+     */
+    public Usuario saveUser(Usuario usuario) {
+        // En el futuro, aquí podrías agregar lógica para encriptar la contraseña
         return usuarioRepository.save(usuario);
     }
 
-    public void delete(String rut) {
-        if (!usuarioRepository.existsById(rut)) {
-            throw new EntityNotFoundException("No se puede eliminar. Usuario no encontrado con ID: " + rut);
+    /**
+     * Elimina un usuario por su ID.
+     * (Modificado para usar Long id en lugar de String rut)
+     */
+    public void deleteUser(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            // Actualizamos el mensaje de error
+            throw new EntityNotFoundException("No se puede eliminar. Usuario no encontrado con ID: " + id);
         }
-        usuarioRepository.deleteById(rut);
+        usuarioRepository.deleteById(id);
     }
 
-    public List<Usuario> findByRol(String rol) {
-        return usuarioRepository.findByRol(rol);
+    /**
+     * Busca un usuario por su ID.
+     * (Requerido por UsuarioControllerV2)
+     */
+    public Optional<Usuario> findById(Long id) {
+        return usuarioRepository.findById(id);
     }
 
-    public Usuario buscarPorCorreo(String email) {
-        return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con correo: " + email));
-    }
-
-    // Ejemplo opcional: método para login (solo si no usas Spring Security)
-    public boolean autenticar(String email, String contrasena) {
-        return usuarioRepository.findByEmail(email)
-                .map(usuario -> usuario.getContrasena().equals(contrasena))
-                .orElse(false);
-    }
-
-    
-
+    // --- MÉTODOS ELIMINADOS ---
+    // findByRut, findByRol, buscarPorCorreo, y autenticar se han eliminado...
 }
