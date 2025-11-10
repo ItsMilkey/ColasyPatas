@@ -1,0 +1,5 @@
+# Ignorar carpetas de Git, IDE y la carpeta de 'build' local
+.git
+.idea
+target/
+.mvn/
