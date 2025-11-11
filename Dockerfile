@@ -1,14 +1,16 @@
-# 1. Base: Usamos una imagen de Java 17 (coincide con tu pom.xml)
-FROM openjdk:17-slim
+# 1. Base: Usamos una imagen de Java 17 estándar (eclipse-temurin)
+FROM eclipse-temurin:17-jdk-focal
 
-# 2. Argumento: Le decimos que el archivo .jar estará en la carpeta 'target'
+# 2. Copia la carpeta wallet (desde su ubicación real)
+#    al interior de la imagen, en una carpeta llamada /wallet
+COPY src/main/resources/wallet /wallet
+
+# 3. Copia el .jar
 ARG JAR_FILE=target/*.jar
-
-# 3. Copia: Copiamos ese .jar al interior de la imagen y lo llamamos 'app.jar'
 COPY ${JAR_FILE} app.jar
 
-# 4. Exponer: Le decimos a Docker que tu app corre en el puerto 8080
+# 4. Exponer puerto
 EXPOSE 8080
 
-# 5. Ejecutar: El comando final para iniciar tu aplicación
-ENTRYPOINT ["java","-jar","/app.jar"]
+# 5. Ejecutar, diciéndole a Java dónde está el TNS_ADMIN
+ENTRYPOINT ["java","-Doracle.tns.admin=/wallet","-jar","/app.jar"]
