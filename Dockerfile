@@ -1,5 +1,5 @@
 # 1. Base: Usamos una imagen de Java 17 (coincide con tu pom.xml)
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-slim
 
 # 2. Argumento: Le decimos que el archivo .jar estará en la carpeta 'target'
 ARG JAR_FILE=target/*.jar
