@@ -24,8 +24,13 @@ COPY --from=builder /app/src/main/resources/wallet /wallet
 # Copia el .jar (que se creó en la etapa 1)
 COPY --from=builder /app/target/*.jar app.jar
 
-# Exponer puerto
+# --- CAMBIO IMPORTANTE AQUÍ ---
+
+# 1. Establecemos la variable de entorno TNS_ADMIN a nivel del sistema
+ENV TNS_ADMIN=/wallet
+
+# 2. Exponer puerto (igual)
 EXPOSE 8080
 
-# Ejecutar, diciéndole a Java dónde está el TNS_ADMIN
-ENTRYPOINT ["java","-Doracle.tns.admin=/wallet","-jar","app.jar"]
+# 3. El Entrypoint ahora es más limpio, ya no necesita el -D
+ENTRYPOINT ["java","-jar","app.jar"]
