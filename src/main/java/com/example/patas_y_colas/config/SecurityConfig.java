@@ -41,13 +41,7 @@ public class SecurityConfig {
                 // Asumimos que tendrás un /api/reviews para tu página de reseñas
                 .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/reviews/**").permitAll()
 
-
-                // --- ¡CAMBIO AÑADIDO (PLAN B)! ---
-                // Hacemos pública la ruta temporal para promover al admin.
-                // Debe ir ANTES de la regla /api/users/**
-                .requestMatchers("/api/users/promote-admin").permitAll() 
-
-
+                
                 // REGLA 2: RUTAS DE ADMIN (Requieren ROLE_ADMIN)
                 //-----------------------------------------------------
                 // Gestión de Usuarios (CRUD completo solo para Admin)

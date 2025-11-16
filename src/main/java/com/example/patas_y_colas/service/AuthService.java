@@ -43,7 +43,7 @@ public class AuthService {
         // 3. Genera un token JWT para ese usuario
         String token = jwtService.generateToken(user);
 
-        // 4. Devuelve el token Y EL ROL
+        // 4. Devuelve el token Y EL ROL (¡CAMBIO AQUÍ!)
         return new AuthResponseDTO(token, user.getRole());
     }
 
@@ -65,6 +65,7 @@ public class AuthService {
         
         // 4. Asigna un rol por defecto.
         // Lógica simple: el primer usuario (id=1) es ADMIN, el resto son USER.
+        // En una app real, esto se manejaría de forma diferente.
         if (usuarioRepository.count() == 0) {
             usuario.setRole(Role.ROLE_ADMIN);
         } else {
@@ -77,7 +78,7 @@ public class AuthService {
         // 6. Genera un token para el nuevo usuario
         String token = jwtService.generateToken(usuario);
 
-        // 7. Devuelve el token Y EL ROL
+        // 7. Devuelve el token Y EL ROL (¡CAMBIO AQUÍ!)
         return new AuthResponseDTO(token, usuario.getRole());
     }
 }

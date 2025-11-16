@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// --- IMPORTACIONES AÑADIDAS PARA EL PLAN B ---
-import com.example.patas_y_colas.model.Role;
-import com.example.patas_y_colas.repository.UsuarioRepository;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.web.bind.annotation.RequestParam;
-// --- FIN DE IMPORTACIONES AÑADIDAS ---
+// --- IMPORTACIONES DEL PLAN B ELIMINADAS ---
+// import com.example.patas_y_colas.model.Role;
+// import com.example.patas_y_colas.repository.UsuarioRepository;
+// import jakarta.persistence.EntityNotFoundException;
+// import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/users") // <-- ¡ESTA ES LA RUTA CORRECTA!
@@ -23,9 +23,9 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // --- DEPENDENCIA AÑADIDA PARA EL PLAN B ---
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    // --- DEPENDENCIA DEL PLAN B ELIMINADA ---
+    // @Autowired
+    // private UsuarioRepository usuarioRepository;
 
     // Endpoint para LISTAR (GET /api/users)
     @GetMapping
@@ -38,6 +38,7 @@ public class UsuarioController {
     }
 
     // Endpoint para AGREGAR (POST /api/users)
+    // (Esto es para que un ADMIN cree un usuario, diferente del registro público)
     @PostMapping
     public ResponseEntity<Usuario> createUser(@RequestBody Usuario usuario) {
         Usuario nuevo = usuarioService.saveUser(usuario);
@@ -55,29 +56,5 @@ public class UsuarioController {
         }
     }
 
-    // --- MÉTODO SECRETO TEMPORAL AÑADIDO (PLAN B) ---
-    /**
-     * Endpoint temporal para promover un usuario a ADMIN.
-     * Uso: /api/users/promote-admin?email=correo@ejemplo.com&key=miClaveSecreta123
-     */
-    @GetMapping("/promote-admin")
-    public ResponseEntity<String> promoteAdmin(
-            @RequestParam("email") String email, 
-            @RequestParam("key") String key
-    ) {
-        // Clave de seguridad simple para que no cualquiera pueda usar esto
-        if (!key.equals("miClaveSecreta123")) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Clave incorrecta");
-        }
-
-        // Buscamos al usuario en la BD de la nube
-        Usuario user = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado: " + email));
-        
-        // Lo promovemos a ADMIN
-        user.setRole(Role.ROLE_ADMIN);
-        usuarioRepository.save(user);
-        
-        return ResponseEntity.ok("¡ÉXITO! El usuario " + email + " ahora es ROLE_ADMIN.");
-    }
+    // --- MÉTODO SECRETO TEMPORAL (PLAN B) ELIMINADO ---
 }
