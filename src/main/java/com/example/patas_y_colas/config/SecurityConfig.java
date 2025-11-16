@@ -3,6 +3,7 @@ package com.example.patas_y_colas.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,54 +15,70 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity // Habilita la seguridad a nivel de método (opcional pero bueno)
+@EnableMethodSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter; // Nuestro filtro (Paso 4)
-    private final AuthenticationProvider authenticationProvider; // Nuestro provider (Paso 3)
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-    /**
-     * Define la cadena de filtros de seguridad
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         
-        // 1. Deshabilitamos CSRF (Cross-Site Request Forgery) - común en APIs REST
         http.csrf(csrf -> csrf.disable());
 
-        // 2. Definimos las reglas de autorización (quién puede ver qué)
         http.authorizeHttpRequests(auth -> auth
                 
-                // REGLA 1: RUTAS PÚBLICAS
-                // Hacemos públicas las rutas de Auth (Login/Register)
+                // REGLA 1: RUTAS PÚBLICAS (No requieren token)
+                //-----------------------------------------------------
+                // Rutas de autenticación
                 .requestMatchers("/api/auth/**").permitAll() 
-                // Hacemos públicas las rutas de Swagger (documentación de la API)
+                // Rutas de Swagger (documentación)
                 .requestMatchers("/doc/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 
-                // REGLA 2: RUTAS DE ADMIN (como pediste)
-                // Solo los usuarios con rol "ADMIN" pueden acceder a estas rutas
+                // Rutas públicas para VER contenido (GET)
+                .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/referrals", "/api/referrals/**").permitAll()
+                // Asumimos que tendrás un /api/reviews para tu página de reseñas
+                .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/reviews/**").permitAll()
+
+                
+                // REGLA 2: RUTAS DE ADMIN (Requieren ROLE_ADMIN)
+                //-----------------------------------------------------
+                // Gestión de Usuarios (CRUD completo solo para Admin)
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
-                .requestMatchers("/api/products/**").hasRole("ADMIN")
-                .requestMatchers("/api/referrals/**").hasRole("ADMIN")
+                
+                // Gestión de Productos (Crear y Borrar solo para Admin)
+                .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+                // .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN") // (Si añades "Editar")
 
-                // REGLA 3: (Opcional, si tuvieras rutas para USER)
-                // .requestMatchers("/api/pedidos/**").hasAnyRole("ADMIN", "USER")
+                // Gestión de Referidos (Crear y Borrar solo para Admin)
+                .requestMatchers(HttpMethod.POST, "/api/referrals").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/referrals/**").hasRole("ADMIN")
+                
+                // Gestión de Reseñas (Crear y Borrar solo para Admin)
+                // Asumimos estos endpoints para tu /admin/reviews
+                .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasRole("ADMIN")
 
+                
+                // REGLA 3: RUTAS AUTENTICADAS (Cualquier usuario logueado)
+                //-----------------------------------------------------
+                // (Ejemplo: para tu página de /perfil. Deberías crear un /api/profile)
+                // .requestMatchers("/api/profile/me").authenticated() 
+
+                
                 // REGLA 4: TODO LO DEMÁS
+                //-----------------------------------------------------
                 // Cualquier otra petición que no coincida, debe estar autenticada
                 .anyRequest().authenticated() 
         );
 
-        // 3. Política de Sesión: STATELESS (sin estado)
-        // No guardamos sesiones en el servidor; cada petición se valida con el token.
         http.sessionManagement(session -> 
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
 
-        // 4. Indicamos qué proveedor de autenticación usar (el nuestro del Paso 3)
         http.authenticationProvider(authenticationProvider);
-
-        // 5. Añadimos nuestro filtro JWT ANTES del filtro estándar de Spring
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
