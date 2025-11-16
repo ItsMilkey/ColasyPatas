@@ -4,14 +4,17 @@ import com.example.patas_y_colas.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-// Ya no se necesitan 'java.util.List' ni 'java.util.Optional'
+import java.util.Optional; // 1. IMPORTACIÓN AÑADIDA
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    // No necesitamos métodos personalizados para el CRUD básico.
-    // JpaRepository ya provee a nuestro UsuarioService de:
-    // - findAll()
-    // - save(Usuario entity)
-    // - deleteById(Long id)
-    // - existsById(Long id)
+    
+    // 2. MÉTODO AÑADIDO
+    /**
+     * Busca un usuario por su dirección de email.
+     * Spring Data JPA creará la consulta automáticamente.
+     * Es necesario para el UserDetailsService de Spring Security.
+     */
+    Optional<Usuario> findByEmail(String email);
+
 }
