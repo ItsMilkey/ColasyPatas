@@ -3,7 +3,7 @@ package com.example.patas_y_colas.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpMethod; // Asegúrate de que HttpMethod esté importado
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,6 +27,11 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable());
 
         http.authorizeHttpRequests(auth -> auth
+                
+                // --- ¡ESTA ES LA LÍNEA AÑADIDA! ---
+                // Permite TODAS las peticiones OPTIONS (preflight de CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                // ------------------------------------
                 
                 // REGLA 1: RUTAS PÚBLICAS (No requieren token)
                 //-----------------------------------------------------
