@@ -69,12 +69,14 @@ public class AuthService {
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         
-        // Lógica de Admin
-        if (usuarioRepository.count() == 0) {
+        // --- LÓGICA DE ROL REFACTORIZADA ---
+        // Revisa si el email (en minúsculas) termina con "@lvlup.com"
+        if (request.getEmail().toLowerCase().endsWith("@lvlup.com")) {
             usuario.setRole(Role.ROLE_ADMIN);
         } else {
             usuario.setRole(Role.ROLE_USER);
         }
+        // --- FIN DE LA LÓGICA REFACTORIZADA ---
 
         usuarioRepository.save(usuario); // <-- AQUÍ SE GUARDA
 
