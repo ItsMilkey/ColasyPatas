@@ -1,20 +1,15 @@
 package com.example.patas_y_colas.controller;
 
 import com.example.patas_y_colas.model.Usuario;
+import com.example.patas_y_colas.repository.UsuarioRepository; // <-- IMPORTACIÓN AÑADIDA
 import com.example.patas_y_colas.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal; // <-- IMPORTACIÓN AÑADIDA
 import java.util.List;
-
-// --- IMPORTACIONES DEL PLAN B ELIMINADAS ---
-// import com.example.patas_y_colas.model.Role;
-// import com.example.patas_y_colas.repository.UsuarioRepository;
-// import jakarta.persistence.EntityNotFoundException;
-// import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/api/users") // <-- ¡ESTA ES LA RUTA CORRECTA!
@@ -23,9 +18,23 @@ public class UsuarioController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // --- DEPENDENCIA DEL PLAN B ELIMINADA ---
-    // @Autowired
-    // private UsuarioRepository usuarioRepository;
+    // --- DEPENDENCIA AÑADIDA PARA EL PERFIL ---
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    // --- NUEVO ENDPOINT: OBTENER MI PROPIO PERFIL ---
+    // (GET /api/users/me)
+    @GetMapping("/me")
+    public ResponseEntity<Usuario> getMyProfile(Principal principal) {
+        // 'principal.getName()' obtiene el email del token JWT
+        String email = principal.getName();
+        
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        return ResponseEntity.ok(usuario);
+    }
+    // ------------------------------------------------
 
     // Endpoint para LISTAR (GET /api/users)
     @GetMapping
@@ -55,6 +64,4 @@ public class UsuarioController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // --- MÉTODO SECRETO TEMPORAL (PLAN B) ELIMINADO ---
 }

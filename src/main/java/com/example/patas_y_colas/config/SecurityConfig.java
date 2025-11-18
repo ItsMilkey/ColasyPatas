@@ -28,23 +28,22 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
                 
-                // --- ¡ESTA ES LA LÍNEA AÑADIDA! ---
                 // Permite TODAS las peticiones OPTIONS (preflight de CORS)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
-                // ------------------------------------
                 
                 // REGLA 1: RUTAS PÚBLICAS (No requieren token)
                 //-----------------------------------------------------
-                // Rutas de autenticación
                 .requestMatchers("/api/auth/**").permitAll() 
-                // Rutas de Swagger (documentación)
                 .requestMatchers("/doc/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                
-                // Rutas públicas para VER contenido (GET)
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/referrals", "/api/referrals/**").permitAll()
-                // Asumimos que tendrás un /api/reviews para tu página de reseñas
                 .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/reviews/**").permitAll()
+
+                
+                // --- ¡LÍNEA AÑADIDA PARA EL PERFIL! ---
+                // Debe ir ANTES de la regla general de "/api/users/**"
+                .requestMatchers("/api/users/me").authenticated()
+                // -----------------------------------------
 
                 
                 // REGLA 2: RUTAS DE ADMIN (Requieren ROLE_ADMIN)
@@ -55,22 +54,19 @@ public class SecurityConfig {
                 // Gestión de Productos (Crear y Borrar solo para Admin)
                 .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-                // .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN") // (Si añades "Editar")
 
                 // Gestión de Referidos (Crear y Borrar solo para Admin)
                 .requestMatchers(HttpMethod.POST, "/api/referrals").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/referrals/**").hasRole("ADMIN")
                 
                 // Gestión de Reseñas (Crear y Borrar solo para Admin)
-                // Asumimos estos endpoints para tu /admin/reviews
                 .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasRole("ADMIN")
 
                 
                 // REGLA 3: RUTAS AUTENTICADAS (Cualquier usuario logueado)
                 //-----------------------------------------------------
-                // (Ejemplo: para tu página de /perfil. Deberías crear un /api/profile)
-                // .requestMatchers("/api/profile/me").authenticated() 
+                // (El endpoint de perfil ya se manejó arriba)
 
                 
                 // REGLA 4: TODO LO DEMÁS
