@@ -25,9 +25,12 @@ public class Producto {
     private String name;
 
     @Column(name = "PRICE", nullable = false)
-    private double price; // Usamos double para el precio
+    private double price;
 
-    @Column(name = "IMAGE", nullable = true, length = 1000) // Permitimos nulo y largo para la URL
-    private String image; // Esta columna guardará la URL de la imagen
+    @Column(name = "IMAGE", nullable = true, length = 1000)
+    private String image;
 
+    // --- NUEVO CAMPO: CATEGORÍA ---
+    @Column(name = "CATEGORY", nullable = false, length = 100)
+    private String category;
 }
