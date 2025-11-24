@@ -33,32 +33,33 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    /**
-     * Maneja el login de un usuario.
-     */
     public AuthResponseDTO login(LoginDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+        } catch (Exception e) {
+            // Lanzamos error si la autenticación falla
+            throw new RuntimeException("Credenciales incorrectas");
+        }
 
         Usuario user = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado después de autenticación"));
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         String token = jwtService.generateToken(user);
 
-        // SE AÑADE EL MENSAJE DE ÉXITO AL FINAL
+        // IMPORTANTE: Usamos el constructor con mensaje que arreglamos antes
         return new AuthResponseDTO(token, user.getRole(), "Inicio de sesión exitoso");
     }
 
-    /**
-     * Maneja el registro de un nuevo usuario.
-     */
     public AuthResponseDTO register(RegisterDTO request) {
+        // Verificar si el email ya existe
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("El email ya está en uso");
+            // ESTO ES LO QUE VERÁS EN POSTMAN (Error 400)
+            throw new RuntimeException("El email " + request.getEmail() + " ya está registrado.");
         }
         
         Usuario usuario = new Usuario();
@@ -66,7 +67,6 @@ public class AuthService {
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         
-        // Lógica de Rol
         if (request.getEmail().toLowerCase().endsWith("@lvlup.com")) {
             usuario.setRole(Role.ROLE_ADMIN);
         } else {
@@ -77,7 +77,6 @@ public class AuthService {
 
         String token = jwtService.generateToken(usuario);
 
-        // SE AÑADE EL MENSAJE DE ÉXITO AL FINAL
         return new AuthResponseDTO(token, usuario.getRole(), "Usuario registrado exitosamente");
     }
 }
