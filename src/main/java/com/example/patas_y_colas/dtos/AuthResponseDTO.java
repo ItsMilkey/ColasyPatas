@@ -1,6 +1,6 @@
 package com.example.patas_y_colas.dtos;
 
-import com.example.patas_y_colas.model.Role; // 1. IMPORTACIÓN AÑADIDA
+import com.example.patas_y_colas.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponseDTO {
-    // Esta es la respuesta que enviaremos al frontend (el token)
+    // Token JWT
     private String token;
     
-    // 2. CAMPO DE ROL AÑADIDO
+    // Rol del usuario (ADMIN o USER)
     private Role role; 
+
+    // 3. CAMPO DE MENSAJE AÑADIDO
+    private String message;
 }

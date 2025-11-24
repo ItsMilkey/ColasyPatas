@@ -6,24 +6,20 @@ import com.example.patas_y_colas.dtos.RegisterDTO;
 import com.example.patas_y_colas.model.Role;
 import com.example.patas_y_colas.model.Usuario;
 import com.example.patas_y_colas.repository.UsuarioRepository;
-// import lombok.RequiredArgsConstructor; // <-- ELIMINADO
-import org.springframework.beans.factory.annotation.Autowired; // <-- AÑADIDO
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-// @RequiredArgsConstructor // <-- ELIMINADO
 public class AuthService {
 
-    // --- CAMPOS (YA NO SON 'FINAL') ---
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    // --- CONSTRUCTOR CON @AUTOWIRED AÑADIDO ---
     @Autowired
     public AuthService(
             UsuarioRepository usuarioRepository,
@@ -53,7 +49,8 @@ public class AuthService {
 
         String token = jwtService.generateToken(user);
 
-        return new AuthResponseDTO(token, user.getRole());
+        // SE AÑADE EL MENSAJE DE ÉXITO AL FINAL
+        return new AuthResponseDTO(token, user.getRole(), "Inicio de sesión exitoso");
     }
 
     /**
@@ -69,19 +66,18 @@ public class AuthService {
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         
-        // --- LÓGICA DE ROL REFACTORIZADA ---
-        // Revisa si el email (en minúsculas) termina con "@lvlup.com"
+        // Lógica de Rol
         if (request.getEmail().toLowerCase().endsWith("@lvlup.com")) {
             usuario.setRole(Role.ROLE_ADMIN);
         } else {
             usuario.setRole(Role.ROLE_USER);
         }
-        // --- FIN DE LA LÓGICA REFACTORIZADA ---
 
-        usuarioRepository.save(usuario); // <-- AQUÍ SE GUARDA
+        usuarioRepository.save(usuario);
 
         String token = jwtService.generateToken(usuario);
 
-        return new AuthResponseDTO(token, usuario.getRole());
+        // SE AÑADE EL MENSAJE DE ÉXITO AL FINAL
+        return new AuthResponseDTO(token, usuario.getRole(), "Usuario registrado exitosamente");
     }
 }
