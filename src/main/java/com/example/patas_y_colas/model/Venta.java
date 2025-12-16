@@ -18,7 +18,6 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Relación con Usuario (Muchas ventas pertenecen a un usuario)
     @ManyToOne
     @JoinColumn(name = "USUARIO_ID", nullable = false)
     private Usuario usuario;
@@ -29,7 +28,8 @@ public class Venta {
     @Column(name = "TOTAL", nullable = false)
     private double total;
 
-    // Relación con los detalles (Una venta tiene muchos productos)
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    // --- CAMBIO CLAVE AQUÍ ---
+    // Cambiamos a EAGER para que SIEMPRE traiga la lista de productos al consultar la venta
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<DetalleVenta> detalles;
 }
