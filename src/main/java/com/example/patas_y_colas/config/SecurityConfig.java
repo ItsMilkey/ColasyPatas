@@ -3,7 +3,7 @@ package com.example.patas_y_colas.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod; // Asegúrate de que HttpMethod esté importado
+import org.springframework.http.HttpMethod; 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/reviews", "/api/reviews/**").permitAll()
 
                 
-                // --- ¡LÍNEA AÑADIDA PARA EL PERFIL! ---
+                // --- RUTAS DE PERFIL ---
                 // Debe ir ANTES de la regla general de "/api/users/**"
                 .requestMatchers("/api/users/me").authenticated()
                 // -----------------------------------------
@@ -66,7 +66,11 @@ public class SecurityConfig {
                 
                 // REGLA 3: RUTAS AUTENTICADAS (Cualquier usuario logueado)
                 //-----------------------------------------------------
-                // (El endpoint de perfil ya se manejó arriba)
+                
+                // --- ¡NUEVA REGLA AÑADIDA PARA VENTAS! ---
+                // Permite comprar y ver historial a cualquier usuario con Token
+                .requestMatchers("/api/ventas/**").authenticated()
+                // -----------------------------------------
 
                 
                 // REGLA 4: TODO LO DEMÁS
