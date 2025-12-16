@@ -1,5 +1,6 @@
 package com.example.patas_y_colas.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // 1. IMPORTACIÓN IMPORTANTE
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class DetalleVenta {
 
     @ManyToOne
     @JoinColumn(name = "VENTA_ID", nullable = false)
+    @JsonIgnore // 2. ESTA ANOTACIÓN EVITA EL BUCLE INFINITO
     private Venta venta;
 
     @ManyToOne
